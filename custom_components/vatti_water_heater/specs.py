@@ -106,6 +106,18 @@ I12571_SWITCHES = (
     SwitchSpec("self_clean", "func_swit1", 1, "mdi:water-outline"),
 )
 
+# GH000072: values observed on the user's i12571B. Keep entity keys stable.
+GH000072_SWITCHES = (
+    SwitchSpec("zero_cold", "func_switch", 3, "mdi:water-sync"),
+    SwitchSpec("jet_cycle", "func_switch", 7, "mdi:sync"),
+    SwitchSpec("waterfall", "func_switch", 5, "mdi:waves"),
+    SwitchSpec("ai_wash", "func_swit1", 5, "mdi:auto-fix"),
+    SwitchSpec("eco", "func_swit1", 3, "mdi:leaf"),
+    SwitchSpec("gas_electric_cutoff", "func_swit1", 2, "mdi:shield-check"),
+    # Existing mapping is unverified; retain it for entity compatibility.
+    SwitchSpec("self_clean", "func_swit1", 1, "mdi:water-outline"),
+)
+
 # 零冷水机型（按抓包实现，未真机实测）
 ZERO_COLD_SWITCHES = (
     SwitchSpec("quick_heat", "func_switch", 1, "mdi:flash"),
@@ -152,6 +164,18 @@ SPEC_I12571 = ProductSpec(
     sensors=BASE_SENSORS,
 )
 
+SPEC_GH000072 = ProductSpec(
+    kind=KIND_ZERO_COLD,
+    label="零冷水燃气热水器 i12571",
+    temp_field="heater_temp",
+    temp_min=35,
+    temp_max=60,
+    current_temp_fields=("owater_temp", "iwater_temp"),
+    switches=GH000072_SWITCHES,
+    supports_smart_temp=False,
+    sensors=BASE_SENSORS,
+)
+
 SPEC_ELECTRIC = ProductSpec(
     kind=KIND_ELECTRIC,
     label="电热水器",
@@ -194,6 +218,8 @@ def spec_for_device(
 def _detect_spec(device: VattiDevice) -> ProductSpec | None:
     product_id = (device.product_id or "").upper()
     model = (device.model or "").lower()
+    if product_id == "GH000072" and "12571" in model:
+        return SPEC_GH000072
     if any(token in model for token in _I12571_MODELS) or any(
         token in product_id.lower() for token in _I12571_MODELS
     ):
@@ -237,3 +263,4 @@ def fault_text(state_props: dict[str, str]) -> str | None:
         if raw and raw != "0":
             parts.append(f"{identifier}={raw}")
     return ", ".join(parts) or None
+
