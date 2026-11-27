@@ -1,0 +1,2 @@
+# 测试依赖；该包会锁定一个与之匹配的 Home Assistant 版本
+pytest-homeassistant-custom-component==0.13.109
