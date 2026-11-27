@@ -1,0 +1,167 @@
+{
+  "config": {
+    "flow_title": "华帝热水器（Vatti）",
+    "step": {
+      "user": {
+        "title": "登录华帝账号",
+        "description": "输入「华帝智慧家」App 注册的手机号。建议专门为 Home Assistant 注册一个新账号，并在 App 里把热水器共享给它，避免与手机 App 互相顶下线。",
+        "data": {
+          "phone": "手机号"
+        }
+      },
+      "captcha": {
+        "title": "完成滑块验证",
+        "description": "正在为 {phone} 获取短信验证码。\n\n1. 打开滑块验证页：{captcha_link}\n2. 完成后票据会自动回传，回到这里直接提交。\n3. 自动回传失败时，把页面上的票据粘贴到下面。\n\n如果链接打不开，可以手动在浏览器访问：{captcha_url}",
+        "data": {
+          "ticket": "滑块票据（可留空）"
+        }
+      },
+      "sms": {
+        "title": "输入短信验证码",
+        "description": "验证码已发送到 {phone}。",
+        "data": {
+          "code": "短信验证码"
+        }
+      },
+      "family": {
+        "title": "选择家庭",
+        "description": "账号下有多个家庭，请选择要接入热水器的家庭。",
+        "data": {
+          "family_id": "家庭"
+        }
+      },
+      "reauth_confirm": {
+        "title": "重新登录",
+        "description": "账号 {phone} 的登录已失效（可能被手机 App 顶下线）。点提交后重新完成滑块与短信验证，设备实体不会丢失。"
+      }
+    },
+    "error": {
+      "invalid_phone": "手机号格式不正确，请输入 11 位中国大陆手机号",
+      "invalid_ticket": "滑块票据无效或已过期，请重新完成滑块",
+      "sms_failed": "短信发送失败：{detail}",
+      "invalid_code": "验证码错误或已过期：{detail}",
+      "login_failed": "登录失败：{detail}",
+      "cannot_connect": "无法连接华帝云，请检查网络后重试"
+    },
+    "abort": {
+      "already_configured": "该账号已经添加过了",
+      "reauth_successful": "重新登录成功",
+      "reauth_failed": "重新登录失败，请删除集成后重新添加",
+      "http_unavailable": "Home Assistant 的 HTTP 组件不可用，无法托管滑块验证页"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "华帝热水器选项",
+        "description": "状态刷新间隔（秒）",
+        "data": {
+          "poll_interval": "状态刷新间隔（秒）",
+          "enable_energy": "启用用气/用水统计",
+          "family_id": "家庭",
+          "device_kind": "机型识别"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "无法读取家庭列表，请检查网络；其它选项仍可保存"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "outlet_temp": {
+        "name": "出水温度"
+      },
+      "inlet_temp": {
+        "name": "进水温度"
+      },
+      "water_flow": {
+        "name": "水流量"
+      },
+      "wifi_signal": {
+        "name": "WiFi 信号"
+      },
+      "fault_code": {
+        "name": "故障码"
+      },
+      "last_reported": {
+        "name": "最后上报"
+      },
+      "gas_today": {
+        "name": "今日用气量"
+      },
+      "gas_week": {
+        "name": "本周用气量"
+      },
+      "gas_year": {
+        "name": "年度用气量"
+      },
+      "water_today": {
+        "name": "今日用水量"
+      },
+      "water_week": {
+        "name": "本周用水量"
+      },
+      "water_year": {
+        "name": "年度用水量"
+      }
+    },
+    "switch": {
+      "preheat": {
+        "name": "一键预热"
+      },
+      "waterfall": {
+        "name": "瀑布浴"
+      },
+      "eco": {
+        "name": "节能洗"
+      },
+      "boost": {
+        "name": "一键增容"
+      },
+      "constant_temp": {
+        "name": "循环恒温"
+      },
+      "quick_heat": {
+        "name": "定时速热"
+      },
+      "comfort_bath": {
+        "name": "舒适浴"
+      },
+      "bathtub": {
+        "name": "浴缸注水"
+      },
+      "ai_wash": {
+        "name": "AI 智洗"
+      },
+      "zero_cold": {
+        "name": "零冷水"
+      },
+      "jet_cycle": {
+        "name": "点动循环"
+      },
+      "self_clean": {
+        "name": "全水路自清洁"
+      }
+    },
+    "binary_sensor": {
+      "online": {
+        "name": "在线"
+      },
+      "problem": {
+        "name": "故障告警"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "立即刷新"
+      }
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "立即刷新",
+      "description": "马上拉取一次所有华帝热水器的最新状态。"
+    }
+  }
+}

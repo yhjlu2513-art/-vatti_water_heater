@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<title>华帝热水器 · 滑块验证</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f4f5f7; margin: 0; padding: 24px; min-height: 100vh;
+    box-sizing: border-box; display: flex; color: #222;
+  }
+  .card {
+    width: 100%; max-width: 440px; margin: auto; background: #fff;
+    border-radius: 14px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,.08);
+  }
+  h1 { font-size: 18px; margin: 0 0 6px; }
+  .sub { color: #777; font-size: 13px; line-height: 1.6; margin-bottom: 18px; }
+  #captcha { min-height: 62px; }
+  label { display: block; font-size: 12px; color: #666; margin: 14px 0 6px; }
+  textarea {
+    width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #dcdfe6;
+    border-radius: 8px; font-size: 12px; font-family: ui-monospace, monospace;
+    resize: vertical; min-height: 84px;
+  }
+  .row { display: flex; gap: 8px; margin-top: 10px; }
+  button {
+    flex: 1; padding: 9px 12px; border: 0; border-radius: 8px;
+    background: #d81e06; color: #fff; font-size: 14px; cursor: pointer;
+  }
+  button.secondary { background: #eef0f3; color: #333; }
+  button:active { opacity: .85; }
+  #status {
+    margin-top: 14px; font-size: 13px; line-height: 1.5; color: #444;
+    background: #f7f8fa; border-radius: 8px; padding: 10px 12px; min-height: 20px;
+    word-break: break-all;
+  }
+  .ok { color: #0a7d32; }
+  .err { color: #c0392b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #101214; color: #e8e8e8; }
+    .card { background: #1b1e22; }
+    textarea { background: #121417; color: #ddd; border-color: #333; }
+    #status { background: #121417; color: #bbb; }
+    button.secondary { background: #2a2f36; color: #ddd; }
+  }
+  /* 滑块面板按锚点定位，锚点靠顶时面板会越出视口 */
+  .geetest_box_wrap {
+    position: fixed !important; left: 50% !important; top: 50% !important;
+    transform: translate(-50%, -50%) !important; margin: 0 !important;
+  }
+  .geetest_mask { position: fixed !important; inset: 0 !important; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>华帝热水器 · 滑块验证</h1>
+  <p class="sub">完成下方滑块后会自动提交并进入下一步，可以直接关闭本页回到 Home Assistant。</p>
+  <div id="captcha"></div>
+  <label for="ticket">票据（自动填充；自动回传失败时手动粘贴到配置页）</label>
+  <textarea id="ticket" readonly placeholder="完成滑块后这里会显示票据"></textarea>
+  <div class="row">
+    <button id="copy" class="secondary" type="button">复制票据</button>
+    <button id="retry" type="button">重新回传</button>
+  </div>
+  <div id="status">等待滑块…</div>
+</div>
+<script src="./ct4.js"></script>
+<script>
+(function () {
+  var statusEl = document.getElementById('status');
+  var ticketEl = document.getElementById('ticket');
+
+  function setStatus(text, kind) {
+    statusEl.textContent = text;
+    statusEl.className = kind || '';
+  }
+
+  var params = new URLSearchParams(location.search);
+  var captchaId = params.get('captchaId') || '__CAPTCHA_ID__';
+  var flowId = params.get('flow_id') || '';
+  var MOUNT = '/api/vatti_water_heater_captcha';
+  var at = location.pathname.indexOf(MOUNT);
+  var ticketUrl = at >= 0
+    ? location.pathname.slice(0, at + MOUNT.length) + '/ticket'
+    : new URL('ticket', location.href).toString();
+
+  function send(text) {
+    setStatus('正在回传票据…');
+    var payload = text;
+    if (flowId) {
+      // 带上 flow_id，HA 收到票据后会直接推进配置流程，不必再回配置页点提交
+      try {
+        var parsed = JSON.parse(text);
+        parsed.flow_id = flowId;
+        payload = JSON.stringify(parsed);
+      } catch (e) { /* 票据不是 JSON 时原样发送 */ }
+    }
+    fetch(ticketUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload
+    }).then(function (response) {
+      return response.text().then(function (body) {
+        return { status: response.status, body: body };
+      });
+    }).then(function (result) {
+      var data = null;
+      try { data = JSON.parse(result.body); } catch (e) { /* 非 JSON */ }
+      if (data && data.ok) {
+        setStatus(flowId
+          ? '验证完成，已自动进入下一步。请回到 Home Assistant 输入短信验证码。'
+          : '票据已回传，请回到 Home Assistant 配置页点提交。', 'ok');
+      } else if (data && data.error) {
+        setStatus('回传失败：' + data.error + '。请复制票据手动粘贴。', 'err');
+      } else {
+        setStatus('回传失败（HTTP ' + result.status + '）。请复制票据手动粘贴。', 'err');
+      }
+    }).catch(function (error) {
+      setStatus('回传失败：' + error + '。请复制票据手动粘贴。', 'err');
+    });
+  }
+
+  window.initAlicom4({ captchaId: captchaId, https: true }, function (captcha) {
+    captcha.appendTo('#captcha')
+      .onReady(function () { setStatus('滑块已就绪，请拖动完成验证'); })
+      .onSuccess(function () {
+        var text = JSON.stringify(captcha.getValidate());
+        ticketEl.value = text;
+        send(text);
+      })
+      .onError(function (event) {
+        setStatus('滑块出错：' + (event.msg || event.code || '未知错误'), 'err');
+      })
+      .onFail(function () { setStatus('验证未通过，请重试', 'err'); })
+      .onClose(function () { setStatus('滑块已关闭，可点击验证区域重新打开'); });
+  });
+
+  document.getElementById('copy').onclick = function () {
+    ticketEl.focus();
+    ticketEl.select();
+    try {
+      document.execCommand('copy');
+      setStatus('已复制，请到配置页粘贴。', 'ok');
+    } catch (e) {
+      setStatus('复制失败，请手动选中复制。', 'err');
+    }
+  };
+
+  document.getElementById('retry').onclick = function () {
+    if (!ticketEl.value) {
+      setStatus('还没有票据，请先完成滑块。', 'err');
+      return;
+    }
+    send(ticketEl.value);
+  };
+})();
+</script>
+</body>
+</html>

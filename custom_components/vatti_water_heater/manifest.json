@@ -1,0 +1,16 @@
+{
+  "domain": "vatti_water_heater",
+  "name": "Vatti 华帝热水器",
+  "version": "1.1.2",
+  "config_flow": true,
+  "dependencies": [
+    "http"
+  ],
+  "documentation": "https://github.com/yhjlu2513-art/vatti_water_heater",
+  "issue_tracker": "https://github.com/yhjlu2513-art/vatti_water_heater/issues",
+  "codeowners": [],
+  "integration_type": "hub",
+  "iot_class": "cloud_polling",
+  "quality_scale": "bronze",
+  "requirements": []
+}

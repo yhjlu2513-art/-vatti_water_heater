@@ -1,0 +1,167 @@
+{
+  "config": {
+    "flow_title": "Vatti Water Heater",
+    "step": {
+      "user": {
+        "title": "Sign in with Vatti account",
+        "description": "Enter the phone number registered in the Vatti Smart Home app. A dedicated account shared with your water heater is recommended, otherwise the app and Home Assistant will sign each other out.",
+        "data": {
+          "phone": "Phone number"
+        }
+      },
+      "captcha": {
+        "title": "Complete the slider captcha",
+        "description": "Requesting an SMS code for {phone}.\n\n1. Open the captcha page: {captcha_link}\n2. The ticket is sent back automatically — just submit here afterwards.\n3. If that fails, paste the ticket shown on the page below.\n\nDirect link: {captcha_url}",
+        "data": {
+          "ticket": "Captcha ticket (optional)"
+        }
+      },
+      "sms": {
+        "title": "Enter SMS code",
+        "description": "A verification code was sent to {phone}.",
+        "data": {
+          "code": "Verification code"
+        }
+      },
+      "family": {
+        "title": "Select a family",
+        "description": "This account has multiple families. Choose the one containing your water heater.",
+        "data": {
+          "family_id": "Family"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Sign in again",
+        "description": "The login for {phone} has expired (probably signed out by the mobile app). Submit to run the captcha and SMS flow again; entities are kept."
+      }
+    },
+    "error": {
+      "invalid_phone": "Invalid phone number, expected 11 digits",
+      "invalid_ticket": "The captcha ticket is invalid or expired, please retry the slider",
+      "sms_failed": "Failed to send SMS: {detail}",
+      "invalid_code": "Wrong or expired verification code: {detail}",
+      "login_failed": "Login failed: {detail}",
+      "cannot_connect": "Cannot reach the Vatti cloud, check your network"
+    },
+    "abort": {
+      "already_configured": "This account is already configured",
+      "reauth_successful": "Re-authentication successful",
+      "reauth_failed": "Re-authentication failed, remove and add the integration again",
+      "http_unavailable": "Home Assistant HTTP component is unavailable, cannot host the captcha page"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Vatti water heater options",
+        "description": "Poll interval (seconds)",
+        "data": {
+          "poll_interval": "Status refresh interval (s)",
+          "enable_energy": "Enable gas/water statistics",
+          "family_id": "Family",
+          "device_kind": "Device type"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not load the family list; other options can still be saved"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "outlet_temp": {
+        "name": "Outlet temperature"
+      },
+      "inlet_temp": {
+        "name": "Inlet temperature"
+      },
+      "water_flow": {
+        "name": "Water flow"
+      },
+      "wifi_signal": {
+        "name": "WiFi signal"
+      },
+      "fault_code": {
+        "name": "Fault code"
+      },
+      "last_reported": {
+        "name": "Last reported"
+      },
+      "gas_today": {
+        "name": "Gas today"
+      },
+      "gas_week": {
+        "name": "Gas this week"
+      },
+      "gas_year": {
+        "name": "Gas this year"
+      },
+      "water_today": {
+        "name": "Water today"
+      },
+      "water_week": {
+        "name": "Water this week"
+      },
+      "water_year": {
+        "name": "Water this year"
+      }
+    },
+    "switch": {
+      "preheat": {
+        "name": "One-key preheat"
+      },
+      "waterfall": {
+        "name": "Waterfall bath"
+      },
+      "eco": {
+        "name": "Eco wash"
+      },
+      "boost": {
+        "name": "Capacity boost"
+      },
+      "constant_temp": {
+        "name": "Constant temperature"
+      },
+      "quick_heat": {
+        "name": "Quick heat"
+      },
+      "comfort_bath": {
+        "name": "Comfort bath"
+      },
+      "bathtub": {
+        "name": "Bathtub fill"
+      },
+      "ai_wash": {
+        "name": "AI wash"
+      },
+      "zero_cold": {
+        "name": "Zero-cold water"
+      },
+      "jet_cycle": {
+        "name": "Instant circulation"
+      },
+      "self_clean": {
+        "name": "Self-clean"
+      }
+    },
+    "binary_sensor": {
+      "online": {
+        "name": "Online"
+      },
+      "problem": {
+        "name": "Problem"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Refresh now"
+      }
+    }
+  },
+  "services": {
+    "refresh": {
+      "name": "Refresh now",
+      "description": "Fetch the latest state of all Vatti water heaters immediately."
+    }
+  }
+}

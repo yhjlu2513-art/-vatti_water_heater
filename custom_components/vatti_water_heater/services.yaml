@@ -1,0 +1,65 @@
+refresh:
+  name: 立即刷新
+  description: 马上拉取一次所有华帝热水器的最新状态（不等下一个轮询周期）。
+
+snapshot:
+  name: 记录状态快照
+  description: >-
+    立即向云端拉取一次设备原始属性并存成快照，用于对比。不会改变设备状态。
+    用法：先执行本服务 → 在手机 App 里操作一次目标功能 → 再执行「对比状态快照」。
+  fields:
+    device:
+      name: 设备
+      description: 设备名称或设备 ID 的一部分。留空表示全部热水器。
+      example: 厨房
+      selector:
+        text:
+
+diff_snapshot:
+  name: 对比状态快照
+  description: >-
+    把当前原始属性与上一次快照逐字段对比，列出发生变化的字段、翻转的位号，
+    并给出可直接填入 specs.py 的 SwitchSpec 代码行。结果会同时输出到通知。
+  fields:
+    device:
+      name: 设备
+      description: 设备名称或设备 ID 的一部分。留空表示全部热水器。
+      example: 厨房
+      selector:
+        text:
+
+watch:
+  name: 连续监听位域
+  description: >-
+    在一段时间内持续采样原始属性，记录每一次字段变化并附上相对时间。
+    适合一次性把 App 上的多个功能挨个点完，再对照时间轴一次性标定全部位号。
+    结束时会把结果推送成通知；中途也可用「查看监听结果」看当前进展。
+  fields:
+    device:
+      name: 设备
+      description: 设备名称或设备 ID 的一部分。留空表示全部热水器。
+      example: 厨房
+      selector:
+        text:
+    duration:
+      name: 监听时长（秒）
+      description: 默认 300 秒，最短 30 秒，最长 900 秒。
+      default: 300
+      selector:
+        number:
+          min: 30
+          max: 900
+          unit_of_measurement: s
+    interval:
+      name: 采样间隔（秒）
+      description: 默认 6 秒。设备上报有延迟，低于 5 秒意义不大，反而增加云端请求。
+      default: 6
+      selector:
+        number:
+          min: 2
+          max: 30
+          unit_of_measurement: s
+
+watch_report:
+  name: 查看监听结果
+  description: 输出当前（或上一次）监听记录到的所有变化，同时推送成通知。
