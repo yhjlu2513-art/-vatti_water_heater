@@ -140,6 +140,9 @@
       "jet_cycle": {
         "name": "Instant circulation"
       },
+      "gas_electric_cutoff": {
+        "name": "Gas and electricity cutoff"
+      },
       "self_clean": {
         "name": "Self-clean"
       }
@@ -165,3 +168,4 @@
     }
   }
 }
+

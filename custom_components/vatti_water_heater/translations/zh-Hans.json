@@ -140,6 +140,9 @@
       "jet_cycle": {
         "name": "点动循环"
       },
+      "gas_electric_cutoff": {
+        "name": "气电双断"
+      },
       "self_clean": {
         "name": "全水路自清洁"
       }
@@ -165,3 +168,4 @@
     }
   }
 }
+
